@@ -35,13 +35,13 @@ class Fun:
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
-    async def say(self, ctx, *msg):
+    async def say(self, ctx, *, msg):
         """Says something through the bot.
         If no message is givin, the message that sent the command will be deleted.
         Must have manage messages permission.
         <message to say>"""
         await ctx.message.delete()
-        await ctx.send(' '.join(msg))
+        await ctx.send(msg)
 
 def setup(bot):
     bot.add_cog(Fun(bot))

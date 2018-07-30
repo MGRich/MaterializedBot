@@ -21,7 +21,7 @@
         "value": "Basic moderation commands to aid in keeping your server stable.",
         "name": "Moderation",
         "commands": {
-            "purge": "Purges up to 100 messages.\nMust have `manage_messages` permission.\n\nSyntax: [count] [member filter]",
+            "purge": "Purges up to 1000 messages.\nMust have `manage_messages` permission.\n\nSyntax: [count] [member filter]",
             "kick": "Kicks a user.\nMust have `kick` permission.\n\nSyntax: <member>",
             "ban": "Bans a user.\nMust have `ban` permission.\n\nSyntax: <member> [reason]",
             "warn": "Soon:tm:.",

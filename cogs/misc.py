@@ -1,4 +1,4 @@
-import discord, json, traceback
+import discord, json, traceback, psutil, os, aiohttp, re, sys
 from discord.ext import commands
 from cogs.helprs.SimplePaginator import SimplePaginator as pag
 from cogs.helprs.suggestions import suggestions
@@ -104,14 +104,14 @@ class Miscellaneous:
        # await ctx.send("Loli sent.")
 
     @commands.command()
-    async def bugrep(self, ctx, *bug):
+    async def bugrep(self, ctx, *, bug):
         """sends a loli to rich cause lolicon
         <image link or upload>"""
         e = discord.Embed(title="BUG REPORT", colour=discord.Colour(0xF04747))
-        try:
-            bug = ' '.join(bug)
-        except:
-            return await ctx.send("Please list a bug.")
+        #try:
+        #    bug = ' '.join(bug)
+        #except:
+        #    return await ctx.send("Please list a bug.")
         try:
             await suggestions.add("dummy", self.bot, ctx, "bugrep", None, e, False, bug)
         except: 
@@ -127,13 +127,26 @@ class Miscellaneous:
     @commands.command(aliases=['getme', 'about'])
     async def info(self, ctx):
         inf = json.load(open('info.json'))
-        tup = (("Version", inf['version']), ("Info", "This is just a general purpose bot for any type of server."), ("Owner", "RMGRich#8192"), ("Servers", len(self.bot.guilds)), ("Support Server", "[Join here.](https://discord.gg/4Wpsswq)"), ("Invite Links", "[Stable]({})\n[Developer]({})".format(discord.utils.oauth_url("464546343797391371"), discord.utils.oauth_url("465942405611257866"))))
+        pro = psutil.Process(os.getpid())
+        tup = (
+        ("Versions", f"Bot Version {inf['version']}\nPython {sys.version.split()[0]}\ndiscord.py rewrite {discord.__version__}"), 
+        ("Info", "This is just a general purpose bot for any type of server.\nOwner: RMGRich#8192"), 
+        ("Counters", f"{len(self.bot.guilds)} Servers\n{len(self.bot.users)} Members"), 
+        ("Invite Links", "[Stable]({})\n[Developer]({})\n[Join the support server here.](https://discord.gg/4Wpsswq)".format(discord.utils.oauth_url("464546343797391371"), discord.utils.oauth_url("465942405611257866"))), 
+        ("Usages", str(pro.cpu_percent() / psutil.cpu_count()) + "% CPU\n" + str(round(pro.memory_info().rss / 1048576, 2)) + " MB Memory"))
         #("Members", len(list(self.bot.get_all_members)))
         e = discord.Embed(title="Info", colour=discord.Colour(inf['color']))
         e.set_footer(text="Made using discord.py.", icon_url="https://cdn.discordapp.com/icons/336642139381301249/3aa641b21acded468308a37eef43d7b3.webp")
         for x in tup:
             e.add_field(name=x[0], value=x[1], inline=True) #not sure if i wanna do inline or not
         await ctx.send(embed=e)
+
+    #@commands.command()
+    #async def yt(self, ctx, *, query):
+    #    #query_string = aiohttp.parse.urlencode()
+    #    html_content = aiohttp.request.urlopen("http://www.youtube.com/results?search_query="+ query})
+    #    search_results = re.findall(r'href=\"\/watch\?v=(.{11})', html_content.read().decode())
+    #    await ctx.send("http://www.youtube.com/watch?v=" + search_results[0])
 
 def setup(bot):
     bot.add_cog(Miscellaneous(bot))
