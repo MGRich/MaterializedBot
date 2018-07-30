@@ -28,7 +28,7 @@ class Moderation:
     @commands.command()
     @commands.guild_only()
     @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx, member:discord.Member, *reason):
+    async def ban(self, ctx, member:discord.Member, *, reason):
         """Bans a user. 
         <member> [reason]"""
         #if len(args) == 0:
@@ -42,7 +42,7 @@ class Moderation:
         if memb == ctx.message.author:
             return await ctx.send("Just leave the server and never come back?")
         #print(member)
-        reasn = ' '.join(reason)  + " - Ban by {}".format(ctx.message.author)
+        reasn = reason + " - Ban by {}".format(ctx.message.author)
         try:
             try:
                 usrm = await memb.send("You were banned from {} for reason: {}".format(ctx.guild.name, reasn))
@@ -67,7 +67,7 @@ class Moderation:
     @commands.command()
     @commands.guild_only()
     @commands.has_permissions(kick_members=True)
-    async def kick(self, ctx, member:discord.Member, *reason):
+    async def kick(self, ctx, member:discord.Member, *, reason):
         """Kicks a user.
         <member> [reason]"""
         #if len(args) == 0:
@@ -81,7 +81,7 @@ class Moderation:
         if memb == ctx.message.author:
             return await ctx.send("Just leave the server?")
         #print(member)
-        reasn = ' '.join(reason)  + " - Kick by {}".format(ctx.message.author)
+        reasn = reason + " - Kick by {}".format(ctx.message.author)
         try:
             try:
                 usrm = await memb.send("You were kicked from {} for reason: {}".format(ctx.guild.name, reasn))
@@ -113,10 +113,10 @@ class Moderation:
     @commands.command()
     @commands.guild_only()
     @commands.has_permissions(manage_messages=True, read_message_history=True)
-    async def purge(self, ctx, count=100, member: discord.Member=None):
+    async def purge(self, ctx, count=1000, member: discord.Member=None):
         """Purges messages.
         [count] [member]"""
-        if count > 100:
+        if count > 1000:
             return await ctx.send("Too many messages.")
         count += 1
         if member:

@@ -6,13 +6,13 @@ class Tags:
         self.bot = bot
 
     @commands.command(aliases=['update'])
-    async def add(self, ctx, tag, string, *strcont):
+    async def add(self, ctx, tag, string, *, strcont):
         """Adds/updates a LOCAL tag.
         Dobule quotes sadly do not work.
         <tag> <tag string>""" 
         tag = tag.lower()
         existed = False
-        tstr = string + " " + ' '.join(strcont)
+        tstr = string + " " + strcont
         if tstr[-1] == " ":
             tstr = tstr[:-1]
         tgs = json.load(open('tags.json'))
@@ -34,13 +34,13 @@ class Tags:
         await ctx.send(f"Tag `{tag}` successfully made (or updated)!")
 
     @commands.command(aliases=['updatep'])
-    async def addp(self, ctx, tag, string, *strcont):
+    async def addp(self, ctx, tag, string, *, strcont):
         """Adds/updates a PUBLIC tag.
         Dobule quotes sadly do not work.
         <tag> <tag string>""" 
         tag = tag.lower()
         existed = False
-        tstr = string + " " + ' '.join(strcont)
+        tstr = string + " " + strcont
         if tstr[-1] == " ":
             tstr = tstr[:-1]
         tgs = json.load(open('tags.json'))

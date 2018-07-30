@@ -1,21 +1,15 @@
-import discord
+import discord, traceback, json, os, sys, asyncio, aiohttp, contextlib, io, inspect
 from discord.ext import commands
-import traceback, json, os, inspect, sys, re, aiohttp, asyncio
-from pprint import pprint #as print
-#from cogs.helprs import suggestions
 
-stable = False
-try:
-    if sys.argv[1] == "stable":
-        data = json.load(open("stable.json"))
-    else:
-        raise ValueError()
-except:
-    data = json.load(open("info.json"))
-#pprint(data)
+data = json.load(open("info.json"))
+#print(data)
 
-if data['stable']:
-    stable = True
+stable = data['stable']
+
+
+def ownerbt():
+    return commands.check(lambda ctx: ctx.message.author.id == 214550163841220609)
+
 
 def prefix(bot, message):
     prf = data['prefix']
@@ -35,14 +29,6 @@ def prefix(bot, message):
                     pass
     return commands.when_mentioned_or(*prf)(bot, message)
 
-def ownerch():
-    return commands.check(lambda ctx: any(x in [data['owners'], ctx.guild.owner.id] for x in [ctx.message.author.id, ctx.guild.owner.id]))
-
-def ownerbt():
-    return commands.check(lambda ctx: ctx.message.author.id == 214550163841220609)
-
-
-#fetch cogs
 cgs = []
 for x in os.listdir("cogs"):
     if os.path.isfile("cogs/" + x):
@@ -52,19 +38,95 @@ bot = commands.Bot(command_prefix=prefix, description="A general bot meant for a
 blocks = json.load(open("blocks.json"))
 bot.remove_command('help')
 
-if __name__ == '__main__':
-        for cog in cgs:
-            try:
-                bot.load_extension(cog)
-            except:
-                print("Failed to load {}.\n".format(cog))
-                traceback.print_exc()
-                print("")
+
+@bot.command(name="eval")
+@ownerbt()
+async def _eval(ctx, *, evl: str):
+    t = None
+    env = {
+        'bot': bot,
+        'ctx': ctx
+    }
+    @contextlib.contextmanager
+    def stdoutIO(stdout=None):
+        old = sys.stdout
+        if stdout is None:
+            stdout = io.StringIO()
+        sys.stdout = stdout
+        yield stdout
+        sys.stdout = old
+    env.update(globals())
+    e = discord.Embed(title="EVAL", colour=discord.Color(0x71CD40), description="Execution was successful!")
+    #e.add_field(name="Input", value=f"```py\n{evl}```")
+    try:
+        with stdoutIO() as s:
+            t = exec(evl, env)
+            if inspect.isawaitable(t):
+                t = await t
+            t = s.getvalue()
+    except:
+        e.description = f"It failed to run."
+        e.colour = discord.Colour(0xFF0000)
+        t = traceback.format_exc()
+        t = t.replace("cliri", ".")
+    e.description = e.description + f"\n```py\n{t}```"
+    try:
+        await ctx.send(embed=e)
+    except discord.HTTPException:
+        await ctx.send("It worked (probably), but the output was too big.")
+
+@bot.command(pass_context = True, hidden=True)
+@ownerbt()
+async def reload(ctx, *cogs): 
+    err = False
+    cogs = list(cogs)
+    cgs = []
+    for x in os.listdir("cogs"):
+        if os.path.isfile("cogs/" + x):
+            cgs.append("cogs.{}".format(x[:-3]))
+    mcgs = cgs
+    for cg in cogs:
+        if "cogs." + cg not in cgs:
+            cogs.remove(cg)
+    if len(cogs) != 0:
+        for x, y in enumerate(cogs):
+            cogs[x] = "cogs." + y
+        mcgs = cogs
+    q = []
+    msg = await ctx.send("Reloading cogs..\n```diff\n! Awaiting edits..```")
+    old = tuple(bot.extensions)
+    if len(old) != len(mcgs):
+        old = mcgs
+    #print(old)
+    for cog in old:
+        bot.unload_extension(cog)
+        q.append(f"\n- {cog}")
+    await msg.edit(content=msg.content[:-21] + ''.join(q) + "```")
+    q = []
+    count = 0
+    for cog in mcgs:
+        count += 1
+        #print(len(q))
+        try:
+            bot.load_extension(cog)
+            q.append(f"\n+ {cog}")
+            #print(cog)
+        except:
+            bot.unload_extension(cog)
+            q.append(msg.content.replace(f"\n! {cog}"))
+            print("-----START {}".format(cog))
+            traceback.print_exc()
+            print("-----END   {}".format(cog))
+            err = True
+        finally:
+            if (len(mcgs) == count) and (len(q) > 0):
+                await msg.edit(content=msg.content[:-3] + ''.join(q) + "```")
+                q = []
+    if not err:
+        await msg.edit(content=msg.content + "\nAll loaded successfully.")
+
 
 async def process_commands(msg):
-    #this is just a simple check to normally process a command with processing normal blocks
-    #print(blocks['blocks'])
-    #print(msg.author.id)
     if msg.author.id == 214550163841220609:
         return await bot.process_commands(msg)
     if msg.author.id in blocks['blocks']:
@@ -75,62 +137,30 @@ async def process_commands(msg):
         return
     return await bot.process_commands(msg)
 
-@bot.command(pass_context=True, hidden=True)
-@ownerbt()
-async def block(ctx, member:discord.Member):
-    blocks['blocks'].append(member.id)
-    json.dump(blocks, open("blocks.json", "w"))
-
-@bot.command(pass_context=True, hidden=True)
-@ownerbt()
-async def unblock(ctx, member:discord.Member):
-    try:
-        blocks['blocks'].remove(member.id)
-    except:
-        return
-    json.dump(blocks, open("blocks.json", "w"))
-
 @bot.event
 async def on_ready():
     print(f'\n\nin as: {bot.user.name} - {bot.user.id}\non version: {discord.__version__}\n')
-    #while True:
-    #    try:
     await bot.change_presence(activity=discord.Activity(name=f"Version {data['version']}! | {data['prefix'][0]}help", type=0))
-    #    except Exception as e:
-     #       #print(type(e).__name__)
-      #      if type(e).__name__ == "ConnectionClosed":
-       #         pass
-        #    else:
-         #       traceback.print_exc()
-        #asyncio.sleep(120)
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    #print(payload, payload.user_id, payload.channel_id, payload.message_id)
     if not stable:
         return
     if not payload.emoji.name in ['✅', '❌']:
         return
     if not payload.user_id in data['owners']:
         return
-    #print('passed owner')
     if not payload.channel_id in [465318267410710551, 465315532602605568, 465315567331704832, 465315853194231810, 465315940813504514, 465314187527323649]:
         return
-    #print('passed channel')
     dat = json.load(open("suggestions.json"))
-    #print(payload.message_id in dat['list'])
     if not payload.message_id in dat['list']:
-        #print('did not pass message')
         return
     dat['list'].remove(payload.message_id)
-    #print('passed message')
-    #finna get to the gOOoOOOOOOODD 
     sta = payload.emoji.name
     if sta == '✅':
         sta = True
     elif sta == '❌':
         sta = False
-    #srv = bot.get_guild(payload.guild_id)
     chl = bot.get_channel(payload.channel_id)
     msg = await chl.get_message(payload.message_id)
     emb = msg.embeds[0]
@@ -141,7 +171,6 @@ async def on_raw_reaction_add(payload):
     for x, y in idd.items():
         ids.append("{0}: {1}".format(x.title(), y))
     ids = '\n'.join(ids)
-    #handle message
     out = bot.get_channel(465598663540998144)
     if sta == True:
         try:
@@ -155,7 +184,6 @@ async def on_raw_reaction_add(payload):
         except:
             pass
         await out.send(f"denied\n```\n{ids}\n```")
-    #handle type specific stuff
     if sta == True:
         if idd['type'] == "imggal-img":
             async with aiohttp.ClientSession() as session:
@@ -170,7 +198,6 @@ async def on_raw_reaction_add(payload):
                                 z += 1
                             else:
                                 break
-                    #print(nm)
                     async with session.get(x) as resp:
                         with open(nm, 'wb') as fle:
                             while True:
@@ -180,13 +207,11 @@ async def on_raw_reaction_add(payload):
                                 fle.write(chunk)
         elif idd['type'] == "imggal":
             os.mkdir(f"imggal//{idd['imggal']}")
-    #finalize
     await msg.delete()
     json.dump(dat, open("suggestions.json", "w"), sort_keys=True, indent=2)
 
 @bot.event
 async def on_message(msg):
-    #print(type(msg.channel))
     if msg.content.startswith("r/"):
         await msg.channel.send(f"https://reddit.com/{msg.content.split()[0]}")
     if not stable:
@@ -226,24 +251,8 @@ async def on_message(msg):
         except:
             traceback.print_exc()
             return await msg.channel.send("rip didnt FUNCTIONE")
-        #await msg.channel.send("yes good")
     except:
         return await process_commands(msg)
-
-
-#@bot.event
-#async def on_message(msg):
-#    #print(type(msg.channel)
-#    if 464546343797391371 in msg.raw_mentions: 
-#        if not msg.guild:
-#            await msg.channel.send("You can simply type a command name in DMs.")
-#            return
-#        else:
-#            if os.path.exists("config/{}/config.json".format(msg.guild.id)):
-#                with open("config/{}/config.json".format(msg.guild.id)) as cfg:
-#                    con = json.load(cfg)
-#                    pref = con['prefix']
-#            await msg.channel.send("My prefix here is {}. You can change it with `!prefix`.".format(pref))
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -273,120 +282,51 @@ async def on_command_error(ctx, error):
     print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
-
-@bot.command(pass_context = True, hidden=True)
+@bot.command()
 @ownerbt()
-async def reload(ctx, *cogs):
-    err = False
-    cogs = list(cogs)
-    cgs = []
-    for x in os.listdir("cogs"):
-        if os.path.isfile("cogs/" + x):
-            cgs.append("cogs.{}".format(x[:-3]))
-    mcgs = cgs
-    for cg in cogs:
-        if "cogs." + cg not in cgs:
-            cogs.remove(cg)
-    if len(cogs) != 0:
-        for x, y in enumerate(cogs):
-            cogs[x] = "cogs." + y
-        mcgs = cogs
-    for cog in mcgs:
-        try:
-            print(f"attempt to load {cog}")
-            bot.unload_extension(cog)
-            bot.load_extension(cog)
-            print(f"loaded {cog}")
-        except:
-            bot.unload_extension(cog)
-            await ctx.send("Failed to load {}. Check console for details.".format(cog))
-            print("-----START {}".format(cog))
-            traceback.print_exc()
-            print("-----END   {}".format(cog))
-            err = True
-    if not err:
-        await ctx.send("All loaded successfully.")
+async def updbot(ctx, force=None):
+    console="py"
+    await ctx.send("Unloading all cogs..")
+    for x in tuple(bot.extensions):
+        bot.unload_extension(x)
+    await ctx.send("Logging off, check console for further progress..")
+    #await bot.close()
+    print("Logged out. Starting the git process..")
+    if stable:
+        br = "master"
+    else:
+        br = "dev"
+    if force:
+        br = "dev"
+    os.system(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git")
+    if stable:
+        os.system("ren git\\bot.py git\\bot.pyw")
+    print("Moving..")
+    os.system("xcopy /e /y git .")
+    print("Deleting..")
+    os.system("rmdir /s /q git")
+    print("Commence restart.")
+    os.execv(sys.executable, [console])
 
-@bot.command(pass_context = True, hidden=True)
+@bot.command()
 @ownerbt()
-async def unload(ctx, *cogs):
-    err = False
-    cogs = list(cogs)
-    cgs = []
-    for x in os.listdir("cogs"):
-        if os.path.isfile("cogs/" + x):
-            cgs.append("cogs.{}".format(x[:-3]))
-    mcgs = cgs
-    for cg in cogs:
-        if "cogs." + cg not in cgs:
-            cogs.remove(cg)
-    if len(cogs) != 0:
-        for x, y in enumerate(cogs):
-            cogs[x] = "cogs." + y
-        mcgs = cogs
-    for cog in mcgs:
-        try:
-            print(f"attempt to unload {cog}")
-            bot.unload_extension(cog)
-            print(f"unloaded {cog}")
-        except:
-            bot.unload_extension(cog)
-            await ctx.send("Failed to load {}. Check console for details.".format(cog))
-            print("-----START {}".format(cog))
-            traceback.print_exc()
-            print("-----END   {}".format(cog))
-            err = True
-    if not err:
-        await ctx.send("All unloaded successfully.")
+async def restart(ctx, console="py"):
+    await ctx.send("Unloading all cogs..")
+    for x in tuple(bot.extensions):
+        bot.unload_extension(x)
+    await ctx.send("Restarting..")
+    #await bot.close()
+    print("Commence restart.")
+    os.execv(sys.executable, [console])
 
-
-@bot.command(pass_context=True, name="eval")
-@ownerbt()
-async def _eval(ctx, *args):
-    """Command only Rich and the server owner can do."""
-    evl = ' '.join(args)
-    t = None
-    env = {
-        'bot': bot,
-        'ctx': ctx
-    }
-    env.update(globals())
-    e = discord.Embed(title="EVAL", colour=discord.Color(0x71CD40))
-    e.add_field(name="Input", value="`" + evl + "`")
-    try:
-        t = str(eval(evl, env))
-        if inspect.isawaitable(t):
-            t = await t
-    except Exception as err:
-        e.description = "It failed to run."
-        e.colour = discord.Colour(0xFF0000)
-        t = str(err)
-    e.add_field(name="Output", value="`" + t + "`")
-    await ctx.send(embed=e)
-
-#@bot.command(pass_context=True)
-#@ownerch()
-#async def test(ctx, member:discord.Member, *args):
-#    await member.send(' '.join(args))
-
-
-#@bot.command(pass_context = True)
-#@ownerch()
     
-#@bot.command(name="test")
-#async def _help(ctx, *args):
-#    """Displays this command.
-#    [category] [command]"""
-#    e = discord.Embed()
-#    args = list(args)
-#    if len(args) >= 1:
-#        args[0] == args[0].lower
-#        e.title = "Category: {}".format(args[0].title())
-#        if len(args) == 2:
-#            args[1] = "_" + args[1].lower()
-#            desc = eval("{}.{}.__doc__".format(args[0], args[1]))
-#            await ctx.send(desc.split('\n'))
-#            return
-#    await ctx.send(args)
 
-bot.run(data['token'], bot=True, reconnect=True)
+if __name__ == '__main__':
+        for cog in cgs:
+            try:
+                bot.load_extension(cog)
+            except:
+                print("Failed to load {}.\n".format(cog))
+                traceback.print_exc()
+                print("")
+        bot.run(data['token'], bot=True, reconnect=True)
