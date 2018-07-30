@@ -1,12 +1,10 @@
 import discord, traceback, json, os, sys, asyncio, aiohttp, contextlib, io, inspect
 from discord.ext import commands
 
-stable = False
 data = json.load(open("info.json"))
 #print(data)
 
-if data['stable']:
-    stable = True
+stable = data['stable']
 
 
 def ownerbt():
@@ -283,6 +281,27 @@ async def on_command_error(ctx, error):
         
     print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
     traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+
+@bot.command()
+@ownerbt()
+async def update(ctx, console=None):
+    await ctx.send("Logging off, check console for further progress..")
+    bot.logout()
+    print("Logged out. Starting the git process..")
+    if stable:
+        br = "master"
+    else:
+        br = "dev"
+    os.system(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git")
+    print("Moving cogs..")
+    os.system("move /y git\\cogs cogs")
+    print("Moving main dir..")
+    os.system("move /y git\\* .")
+    print("Finishing up..")
+    os.system("rmdir /S /Q git")
+    print("Commence restart.")
+    os.execv(sys.executable, ['py'])
+    
 
 if __name__ == '__main__':
         for cog in cgs:
