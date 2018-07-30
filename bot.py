@@ -284,7 +284,7 @@ async def on_command_error(ctx, error):
 
 @bot.command()
 @ownerbt()
-async def updbot(ctx, console=None):
+async def updbot(ctx, console="py"):
     await ctx.send("Unloading all cogs..")
     for x in bot.extensions:
         bot.unload_extension(x)
@@ -303,7 +303,7 @@ async def updbot(ctx, console=None):
     print("Finishing up..")
     os.system("rmdir /S /Q git")
     print("Commence restart.")
-    os.execv(sys.executable, ['py'])
+    os.execv(sys.executable, [console])
     
 
 if __name__ == '__main__':
