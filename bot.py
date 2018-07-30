@@ -284,7 +284,7 @@ async def on_command_error(ctx, error):
 
 @bot.command()
 @ownerbt()
-async def update(ctx, console=None):
+async def updbot(ctx, console=None):
     await ctx.send("Logging off, check console for further progress..")
     bot.logout()
     print("Logged out. Starting the git process..")
