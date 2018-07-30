@@ -304,6 +304,18 @@ async def updbot(ctx, console="py"):
     os.system("rmdir /S /Q git")
     print("Commence restart.")
     os.execv(sys.executable, [console])
+
+@bot.command()
+@ownerbt()
+async def restart(ctx, console="py"):
+    await ctx.send("Unloading all cogs..")
+    for x in tuple(bot.extensions):
+        bot.unload_extension(x)
+    await ctx.send("Restarting..")
+    #await bot.close()
+    print("Commence restart.")
+    os.execv(sys.executable, [console])
+
     
 
 if __name__ == '__main__':
