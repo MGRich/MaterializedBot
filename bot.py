@@ -286,7 +286,7 @@ async def on_command_error(ctx, error):
 @ownerbt()
 async def updbot(ctx, console=None):
     await ctx.send("Logging off, check console for further progress..")
-    bot.logout()
+    await bot.logout()
     print("Logged out. Starting the git process..")
     if stable:
         br = "master"
