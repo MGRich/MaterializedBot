@@ -299,6 +299,8 @@ async def updbot(ctx, force=None):
     if force:
         br = "dev"
     os.system(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git")
+    if stable:
+        os.system("ren git\\bot.py git\\bot.pyw")
     print("Moving..")
     os.system("xcopy /e /y git .")
     print("Deleting..")
