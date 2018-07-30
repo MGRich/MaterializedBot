@@ -286,10 +286,10 @@ async def on_command_error(ctx, error):
 @ownerbt()
 async def updbot(ctx, console="py"):
     await ctx.send("Unloading all cogs..")
-    for x in bot.extensions:
+    for x in tuple(bot.extensions):
         bot.unload_extension(x)
     await ctx.send("Logging off, check console for further progress..")
-    await bot.logout()
+    #await bot.close()
     print("Logged out. Starting the git process..")
     if stable:
         br = "master"
