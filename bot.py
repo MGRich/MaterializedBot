@@ -284,7 +284,8 @@ async def on_command_error(ctx, error):
 
 @bot.command()
 @ownerbt()
-async def updbot(ctx, console="py"):
+async def updbot(ctx, force=None):
+    console="py"
     await ctx.send("Unloading all cogs..")
     for x in tuple(bot.extensions):
         bot.unload_extension(x)
@@ -294,6 +295,8 @@ async def updbot(ctx, console="py"):
     if stable:
         br = "master"
     else:
+        br = "dev"
+    if force:
         br = "dev"
     os.system(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git")
     print("Moving..")
