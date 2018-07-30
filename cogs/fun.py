@@ -20,7 +20,7 @@ class Fun:
         #    args.append(ctx.guild.id)
         #msg = discord.Message()
         #await ctx.send(args)
-        await ctx.send("how the fuck did you find this")
+        await ctx.send("how the fuck did you find thiss")
 
     @commands.cooldown(3,120,BucketType.user) 
     @commands.command()
