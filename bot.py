@@ -296,12 +296,10 @@ async def updbot(ctx, console="py"):
     else:
         br = "dev"
     os.system(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git")
-    print("Moving cogs..")
-    os.system("move /y git\\cogs cogs")
-    print("Moving main dir..")
-    os.system("move /y git\\* .")
-    print("Finishing up..")
-    os.system("rmdir /S /Q git")
+    print("Moving..")
+    os.system("xcopy /e /y git .")
+    print("Deleting..")
+    os.system("rmdir /s /q git")
     print("Commence restart.")
     os.execv(sys.executable, [console])
 
