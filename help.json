@@ -1,0 +1,63 @@
+{
+    "fun": {
+        "value": "General fun commands for your enjoyment.",
+        "name": "Fun",
+        "commands": {
+            "randping": "Pings a random user for your enjoyment.",
+            "say": "Says something through the bot.\nIf no message is given, the message that sent the command will be deleted.\nMust have manage messages permission.\n\nSyntax: <message to say>"
+        }
+    },
+    "imggal": {
+        "value": "An command system to simulate a public image gallery.",
+        "name": "IMGGal",
+        "commands": {
+            "imggal": "Initiates an IMGGal.\n\nSyntax: [imggal]",
+            "list": "Lists all the current IMGGals and how many images are in them.",
+            "request": "Requests for an IMGGal to be created.\nIf accepted, an empty IMGGal will be made with that name.\nYou can then use `submit` to add images.\n\nSyntax: <imggal to be made>",
+            "submit": "Submits image(s) for an IMGGal.\nIf accepted, the image(s) will be downloaded into the corresponding IMGGal.\nYou can submit 4 ATTACHMENTS at a time due to API limitations.\nI'm pretty sure more than 4 links work.\n\nSyntax: <existing imggal> <image link(s) or attachment(s)>"
+        }
+    },
+    "moderation": {
+        "value": "Basic moderation commands to aid in keeping your server stable.",
+        "name": "Moderation",
+        "commands": {
+            "purge": "Purges up to 100 messages.\nMust have `manage_messages` permission.\n\nSyntax: [count] [member filter]",
+            "kick": "Kicks a user.\nMust have `kick` permission.\n\nSyntax: <member>",
+            "ban": "Bans a user.\nMust have `ban` permission.\n\nSyntax: <member> [reason]",
+            "warn": "Soon:tm:.",
+            "warnings": "Soon:tm:."
+        }
+    },
+    "simple":  {
+        "value": "Simple commands that are basically categoryless.",
+        "name": "Simple",
+        "commands": {
+            "ping": "Pings the bot.",
+            "prefix": "Sets or displays the prefix in the server.\nIf the prefix given is \"default\", the prefix will revert to normal.\n\nSyntax: [prefix if wanting to set]"
+        }
+    },
+    "tags": {
+        "value": "A tag system where people can create, share, and use various tags. Also a pain in the ass to implement.",
+        "name": "Tags",
+        "commands": {
+            "add": "Adds/updates a LOCAL tag.\nDouble quotes sadly do not work.\nYou must own the tag to update it.\n\nSyntax: <tag> <tag string>\nAlias: `update`",
+            "addp": "Adds/updates a PUBLIC tag.\nDouble quotes sadly do not work.\nYou must own the tag to update it.\n\nSyntax: <tag> <tag string>\nAlias: `update`",
+            "delete": "Deletes a LOCAL tag.\nYou must own the tag.\n\nSyntax: <tag>",
+            "deletep": "Deletes a PUBLIC tag.\nYou must own the tag.\n\nSyntax: <tag>",
+            "owner": "Displays who owns a tag.\nWorks with both local and public tags.\n\nSyntax: <tag>",
+            "tag": "Displays a tag.\nLocal tags override public tags.\n\nSyntax: <tag>",
+            "tagp": "Displays a tag with local tags overriding public tags.\n\nSyntax: <tag>"
+        }
+    },
+    "miscellaneous": {
+        "value": "Various commands that do not belong in a category.",
+        "name": "Miscellaneous",
+        "commands":  {
+            "help": "Displays this command.\n\nSyntax: [category] [command]",
+            "suggest": "Suggests an idea.\n`type` (optional) can be IMGGal, simple, moderation, fun, or general.\nIf `type` is none of those, general is used.\n\nSyntax: [type] <suggestion>",
+            "sloli": "(CURRENTLY DISABLED due to overuse)\nsends a loli to rich because non-sexual lolicon\n(if you send nsfw loli you will be banned from bot)\n\nSyntax: <image link or attachment>",
+            "bugrep": "Reports a bug anonymously.\nSyntax: <bug>",
+            "info": "Shows many information about the bot.\nAliases: `getme`, `about`"
+        }
+    }
+}
