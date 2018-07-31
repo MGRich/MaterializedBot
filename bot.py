@@ -10,7 +10,6 @@ stable = data['stable']
 def ownerbt():
     return commands.check(lambda ctx: ctx.message.author.id == 214550163841220609)
 
-
 def prefix(bot, message):
     prf = data['prefix']
     try:
@@ -291,22 +290,25 @@ async def updbot(ctx, force=None):
         bot.unload_extension(x)
     await ctx.send("Logging off, check console for further progress..")
     #await bot.close()
-    print("Logged out. Starting the git process..")
-    if stable:
-        br = "master"
-    else:
-        br = "dev"
-    if force:
-        br = "dev"
-    subprocess.Popen(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git".split()).communicate()
-    if stable:
-        subprocess.Popen("ren git\\bot.py bot.pyw".split()).communicate()
-    print("Moving..")
-    subprocess.Popen("xcopy /e /y git .".split()).communicate()
-    print("Deleting..")
-    subprocess.Popen("del /s /q git\\*".split()).communicate()
-    print("Commence restart.")
-    os.execv(sys.executable, [console, __file__])
+    try:
+        print("Logged out. Starting the git process..")
+        if stable:
+            br = "master"
+        else:
+            br = "dev"
+        if force:
+            br = "dev"
+        subprocess.Popen(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git".split()).communicate()
+        if stable:
+            subprocess.Popen("ren git\\bot.py bot.pyw".split()).communicate()
+        print("Moving..")
+        subprocess.Popen("xcopy /e /y git .".split()).communicate()
+        print("Deleting..")
+        subprocess.Popen("del /s /q git\\*".split()).communicate()
+        print("Commence restart.")
+        os.execv(sys.executable, [console, __file__])
+    except:
+        await ctx.send(traceback.format_exc())
 
 @bot.command()
 @ownerbt()
@@ -349,4 +351,6 @@ if __name__ == '__main__':
                 print("Failed to load {}.\n".format(cog))
                 traceback.print_exc()
                 print("")
+        if len(sys.argv) == 2:
+            bot.get_channel(int(sys.argv[1])).send("Restarted.")
         bot.run(data['token'], bot=True, reconnect=True)
