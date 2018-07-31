@@ -304,7 +304,7 @@ async def updbot(ctx, force=None):
     print("Moving..")
     subprocess.Popen("xcopy /e /y git .".split()).communicate()
     print("Deleting..")
-    subprocess.Popen("rmdir /s /q git".split()).communicate()
+    subprocess.Popen("del /s /q git\\*".split()).communicate()
     print("Commence restart.")
     os.execv(sys.executable, [console, __file__])
 
