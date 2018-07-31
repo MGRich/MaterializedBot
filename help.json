@@ -4,7 +4,9 @@
         "name": "Fun",
         "commands": {
             "randping": "Pings a random user for your enjoyment.",
-            "say": "Says something through the bot.\nIf no message is given, the message that sent the command will be deleted.\nMust have manage messages permission.\n\nSyntax: <message to say>"
+            "say": "Says something through the bot.\nIf no message is given, the message that sent the command will be deleted.\nMust have manage messages permission.\n\nSyntax: <message to say>",
+            "quote": "Quotes a message by message ID. The command must be run in the same channel as the ID.\nSyntax: <message id> [member]",
+            "fakequote": "Creates a fake quote.\nSyntax: <member> <text>"
         }
     },
     "imggal": {
