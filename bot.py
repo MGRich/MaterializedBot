@@ -1,4 +1,4 @@
-import discord, traceback, json, os, sys, asyncio, aiohttp, contextlib, io, inspect
+import discord, traceback, json, os, sys, asyncio, aiohttp, contextlib, io, inspect, subprocess
 from discord.ext import commands
 
 data = json.load(open("info.json"))
@@ -285,7 +285,7 @@ async def on_command_error(ctx, error):
 @bot.command()
 @ownerbt()
 async def updbot(ctx, force=None):
-    console="py"
+    console="python"
     await ctx.send("Unloading all cogs..")
     for x in tuple(bot.extensions):
         bot.unload_extension(x)
@@ -300,24 +300,28 @@ async def updbot(ctx, force=None):
         br = "dev"
     os.system(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git")
     if stable:
-        os.system("ren git\\bot.py git\\bot.pyw")
+        os.system("ren git\\bot.py bot.pyw")
     print("Moving..")
-    os.system("xcopy /e /y git .")
+    subprocess.Popen("xcopy /e /y git .", shell=True).communicate()
     print("Deleting..")
-    os.system("rmdir /s /q git")
+    subprocess.Popen("rmdir /s /q git", shell=True).communicate()
     print("Commence restart.")
-    os.execv(sys.executable, [console])
+    os.execv(sys.executable, [console, __file__])
 
 @bot.command()
 @ownerbt()
-async def restart(ctx, console="py"):
+async def restart(ctx, console="python"):
     await ctx.send("Unloading all cogs..")
     for x in tuple(bot.extensions):
         bot.unload_extension(x)
     await ctx.send("Restarting..")
     #await bot.close()
     print("Commence restart.")
-    os.execv(sys.executable, [console])
+    os.execv(sys.executable, [console, __file__])
+
+#@bot.command()
+#@ownerbt()
+#async def json
 
     
 
