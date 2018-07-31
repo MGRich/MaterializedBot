@@ -289,7 +289,7 @@ async def updbot(ctx, force=None):
     await ctx.send("Unloading all cogs..")
     for x in tuple(bot.extensions):
         bot.unload_extension(x)
-    await ctx.send("Logging off, check console for further progress..")
+    await ctx.send("Check console for detailed progress.")
     #await bot.close()
     #try:
     print("Logged out. Starting the git process..")
@@ -302,6 +302,7 @@ async def updbot(ctx, force=None):
     subprocess.Popen(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git".split()).communicate()
     if stable:
         subprocess.Popen("ren git\\bot.py bot.pyw".split()).communicate()
+    await ctx.send("Moving and deleting files..")
     print("Moving..")
     subprocess.Popen("xcopy /e /y git .", shell=True).communicate()
     print("Deleting..")
@@ -311,6 +312,7 @@ async def updbot(ctx, force=None):
         subprocess.Popen("rmdir /s /q git\\.git", shell=True).communicate()
     except:
         pass
+    await ctx.send("Restarting..")
     print("Commence restart.")
     os.execv(sys.executable, [console, __file__, str(ctx.channel.id)])
     #except:
