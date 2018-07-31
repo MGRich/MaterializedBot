@@ -300,7 +300,7 @@ async def updbot(ctx, force=None):
     if force:
         br = "dev"
     subprocess.Popen(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git".split()).communicate()
-    if stable:
+    if __file__.endswith("pyw"):
         subprocess.Popen("ren git\\bot.py bot.pyw", shell=True).communicate()
     await ctx.send("Moving and deleting files..")
     print("Moving..")
