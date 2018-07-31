@@ -298,13 +298,13 @@ async def updbot(ctx, force=None):
         br = "dev"
     if force:
         br = "dev"
-    os.system(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git")
+    subprocess.Popen(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git".split()).communicate()
     if stable:
-        os.system("ren git\\bot.py bot.pyw")
+        subprocess.Popen("ren git\\bot.py bot.pyw".split()).communicate()
     print("Moving..")
-    subprocess.Popen("xcopy /e /y git .", shell=True).communicate()
+    subprocess.Popen("xcopy /e /y git .".split()).communicate()
     print("Deleting..")
-    subprocess.Popen("rmdir /s /q git", shell=True).communicate()
+    subprocess.Popen("rmdir /s /q git".split()).communicate()
     print("Commence restart.")
     os.execv(sys.executable, [console, __file__])
 
