@@ -302,9 +302,9 @@ async def updbot(ctx, force=None):
         if stable:
             subprocess.Popen("ren git\\bot.py bot.pyw".split()).communicate()
         print("Moving..")
-        subprocess.Popen("xcopy /e /y git .".split()).communicate()
+        subprocess.Popen("xcopy /e /y git .", shell=True).communicate()
         print("Deleting..")
-        subprocess.Popen("del /s /q git\\*".split()).communicate()
+        subprocess.Popen("del /s /q git\\*", shell=True).communicate()
         print("Commence restart.")
         os.execv(sys.executable, [console, __file__])
     except:
