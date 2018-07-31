@@ -319,10 +319,26 @@ async def restart(ctx, console="python"):
     print("Commence restart.")
     os.execv(sys.executable, [console, __file__])
 
+@bot.command()
+@ownerbt()
+async def jsoncl(ctx, *jsnn):
+    if len(jsnn) == 0:
+        jsnl = os.listdir()
+    else:
+        jsnl = []
+        for x in jsnn:
+            jsnl.append(x + ".json")
+    jsnl = [x for x in jsnl if (x not in ['help.json', 'info.json', 'stable.json', 'suggestions.json', 'tags.json', 'blocks.json']) and (x.endswith("json"))]
+    if len(jsnl) == 0:
+        return await ctx.send("No lists were modified.")
+    for x in jsnl:
+        if x == 'igl.json':
+            json.dump({'channel': [], 'user': []}, open(x, 'w'))
+        await ctx.send(f"`{x}` modified.")
+
 #@bot.command()
 #@ownerbt()
-#async def json
-
+#async def gitcom(ctx, branch="dev"):
     
 
 if __name__ == '__main__':
