@@ -306,8 +306,11 @@ async def updbot(ctx, force=None):
         subprocess.Popen("xcopy /e /y git .", shell=True).communicate()
         print("Deleting..")
         subprocess.Popen("del /s /q git\\*", shell=True).communicate()
-        subprocess.Popen("rmdir /s /q git\\cogs", shell=True).communicate()
-        subprocess.Popen("rmdir /s /q git\\.git", shell=True).communicate()
+        try:
+            subprocess.Popen("rmdir /s /q git\\cogs", shell=True).communicate()
+            subprocess.Popen("rmdir /s /q git\\.git", shell=True).communicate()
+        except:
+            pass
         print("Commence restart.")
         os.execv(sys.executable, [console, __file__])
     except:
