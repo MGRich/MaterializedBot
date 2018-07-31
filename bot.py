@@ -291,22 +291,28 @@ async def updbot(ctx, force=None):
         bot.unload_extension(x)
     await ctx.send("Logging off, check console for further progress..")
     #await bot.close()
-    print("Logged out. Starting the git process..")
-    if stable:
-        br = "master"
-    else:
-        br = "dev"
-    if force:
-        br = "dev"
-    subprocess.Popen(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git".split()).communicate()
-    if stable:
-        subprocess.Popen("ren git\\bot.py bot.pyw".split()).communicate()
-    print("Moving..")
-    subprocess.Popen("xcopy /e /y git .".split()).communicate()
-    print("Deleting..")
-    subprocess.Popen("del /s /q git\\*".split()).communicate()
-    print("Commence restart.")
-    os.execv(sys.executable, [console, __file__])
+    try:
+        print("Logged out. Starting the git process..")
+        if stable:
+            br = "master"
+        else:
+            br = "dev"
+        if force:
+            br = "dev"
+        subprocess.Popen(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git".split()).communicate()
+        if stable:
+            subprocess.Popen("ren git\\bot.py bot.pyw".split()).communicate()
+        print("Moving..")
+        subprocess.Popen("xcopy /e /y git .", shell=True).communicate()
+        print("Deleting..")
+        subprocess.Popen("del /s /q git\\*", shell=True).communicate()
+        subprocess.Popen("rmdir /s /q git\\cogs", shell=True).communicate()
+        subprocess.Popen("rmdir /s /q git\\.git", shell=True).communicate()
+        print("Commence restart.")
+        os.execv(sys.executable, [console, __file__])
+    except:
+        os.system("del /s /q git\\*")
+        await ctx.send(traceback.format_exc())
 
 @bot.command()
 @ownerbt()
@@ -319,26 +325,10 @@ async def restart(ctx, console="python"):
     print("Commence restart.")
     os.execv(sys.executable, [console, __file__])
 
-@bot.command()
-@ownerbt()
-async def jsoncl(ctx, *jsnn):
-    if len(jsnn) == 0:
-        jsnl = os.listdir()
-    else:
-        jsnl = []
-        for x in jsnn:
-            jsnl.append(x + ".json")
-    jsnl = [x for x in jsnl if (x not in ['help.json', 'info.json', 'stable.json', 'suggestions.json', 'tags.json', 'blocks.json']) and (x.endswith("json"))]
-    if len(jsnl) == 0:
-        return await ctx.send("No lists were modified.")
-    for x in jsnl:
-        if x == 'igl.json':
-            json.dump({'channel': [], 'user': []}, open(x, 'w'))
-        await ctx.send(f"`{x}` modified.")
-
 #@bot.command()
 #@ownerbt()
-#async def gitcom(ctx, branch="dev"):
+#async def json
+
     
 
 if __name__ == '__main__':
