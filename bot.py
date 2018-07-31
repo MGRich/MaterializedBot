@@ -291,31 +291,31 @@ async def updbot(ctx, force=None):
         bot.unload_extension(x)
     await ctx.send("Logging off, check console for further progress..")
     #await bot.close()
+    #try:
+    print("Logged out. Starting the git process..")
+    if stable:
+        br = "master"
+    else:
+        br = "dev"
+    if force:
+        br = "dev"
+    subprocess.Popen(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git".split()).communicate()
+    if stable:
+        subprocess.Popen("ren git\\bot.py bot.pyw".split()).communicate()
+    print("Moving..")
+    subprocess.Popen("xcopy /e /y git .", shell=True).communicate()
+    print("Deleting..")
     try:
-        print("Logged out. Starting the git process..")
-        if stable:
-            br = "master"
-        else:
-            br = "dev"
-        if force:
-            br = "dev"
-        subprocess.Popen(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git".split()).communicate()
-        if stable:
-            subprocess.Popen("ren git\\bot.py bot.pyw".split()).communicate()
-        print("Moving..")
-        subprocess.Popen("xcopy /e /y git .", shell=True).communicate()
-        print("Deleting..")
         subprocess.Popen("del /s /q git\\*", shell=True).communicate()
-        try:
-            subprocess.Popen("rmdir /s /q git\\cogs", shell=True).communicate()
-            subprocess.Popen("rmdir /s /q git\\.git", shell=True).communicate()
-        except:
-            pass
-        print("Commence restart.")
-        os.execv(sys.executable, [console, __file__])
+        subprocess.Popen("rmdir /s /q git\\cogs", shell=True).communicate()
+        subprocess.Popen("rmdir /s /q git\\.git", shell=True).communicate()
     except:
-        os.system("del /s /q git\\*")
-        await ctx.send(traceback.format_exc())
+        pass
+    print("Commence restart.")
+    os.execv(sys.executable, [console, __file__, str(ctx.channel.id)])
+    #except:
+    #    os.system("del /s /q git\\*")
+    #    await ctx.send(traceback.format_exc())
 
 @bot.command()
 @ownerbt()
@@ -326,7 +326,7 @@ async def restart(ctx, console="python"):
     await ctx.send("Restarting..")
     #await bot.close()
     print("Commence restart.")
-    os.execv(sys.executable, [console, __file__])
+    os.execv(sys.executable, [console, __file__, str(ctx.channel.id)])
 
 #@bot.command()
 #@ownerbt()
@@ -342,4 +342,7 @@ if __name__ == '__main__':
                 print("Failed to load {}.\n".format(cog))
                 traceback.print_exc()
                 print("")
+        if len(sys.argv) == 2:
+            ch = bot.get_channel(int(sys.argv[1]))
+            #why are you not working -->   await ch.send("Restarted!")
         bot.run(data['token'], bot=True, reconnect=True)
