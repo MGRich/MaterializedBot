@@ -300,7 +300,7 @@ async def on_command_error(ctx, error):
 @bot.command()
 @ownerbt()
 async def updbot(ctx, force=None):
-    console="python"
+    console="python3.6"
     await ctx.send("Unloading all cogs..")
     for x in tuple(bot.extensions):
         bot.unload_extension(x)
@@ -324,7 +324,7 @@ async def updbot(ctx, force=None):
     subprocess.Popen("mv git .", shell=True).communicate()
     print("Deleting..")
     try:
-        subprocess.Popen("del -f -r git", shell=True).communicate()
+        subprocess.Popen("rm -f -r git", shell=True).communicate()
     except:
         pass
     await ctx.send("Restarting..")
