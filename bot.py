@@ -4,8 +4,10 @@ from discord.ext import commands
 data = json.load(open("info.json"))
 #print(data)
 
+pi = False
 stable = data['stable']
-
+if os.name == "posix":
+    pi = True
 
 def ownerbt():
     return commands.check(lambda ctx: ctx.message.author.id == 214550163841220609)
@@ -39,9 +41,9 @@ blocks = json.load(open("blocks.json"))
 bot.remove_command('help')
 
 
-@bot.command(name="eval")
+@bot.command(aliases=['eval', 'exec'])
 @ownerbt()
-async def _eval(ctx, *, evl: str):
+async def _exec(ctx, *, evl: str):
     t = None
     env = {
         'bot': bot,
@@ -56,16 +58,22 @@ async def _eval(ctx, *, evl: str):
         yield stdout
         sys.stdout = old
     env.update(globals())
-    e = discord.Embed(title="EVAL", colour=discord.Color(0x71CD40), description="Execution was successful!")
+    out = ctx.invoked_with
+    e = discord.Embed(title=out.upper(), colour=discord.Color(0x71CD40), description="Execution was successful!")
     #e.add_field(name="Input", value=f"```py\n{evl}```")
     try:
-        with stdoutIO() as s:
-            t = exec(evl, env)
+        if out == 'eval':
+            t = eval(evl, env)
             if inspect.isawaitable(t):
                 t = await t
-            t = s.getvalue()
+        else:
+            with stdoutIO() as s:
+                t = exec(evl, env)
+                if inspect.isawaitable(t):
+                    t = await t
+                t = s.getvalue()
     except:
-        e.description = f"It failed to run."
+        e.description = "It failed to run."
         e.colour = discord.Colour(0xFF0000)
         t = traceback.format_exc()
         t = t.replace("cliri", ".")
@@ -206,7 +214,7 @@ async def on_raw_reaction_add(payload):
                                     break
                                 fle.write(chunk)
         elif idd['type'] == "imggal":
-            os.mkdir(f"imggal//{idd['imggal']}")
+            os.mkdir(f"imggal/{idd['imggal']}")
     await msg.delete()
     json.dump(dat, open("suggestions.json", "w"), sort_keys=True, indent=2)
 
@@ -279,8 +287,15 @@ async def on_command_error(ctx, error):
     elif isinstance(error, commands.CheckFailure):
         return await ctx.send("You are not able to use this command.")
         
-    print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-    traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+    err = traceback.format_exception(type(error), error, error.__traceback__)
+    err = ''.join(err)
+    err = err.replace("liri", ".")
+    e = discord.Embed(title="ERROR OCCURED", description=f"An exception occured in the code. Rich has been send this error report and will get to it.```py\n{err}```")
+    await ctx.send(embed=e)
+    owner = bot.get_user(214550163841220609)
+    await owner.send(f"```\n{ctx.message.content}\n{ctx.author.id}\n{ctx.command}\n{ctx.cog}```", embed=e)
+    #print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+    #traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 @bot.command()
 @ownerbt()
@@ -299,24 +314,25 @@ async def updbot(ctx, force=None):
         br = "dev"
     if force:
         br = "dev"
+    if pi:
+        br = "pi"
     subprocess.Popen(f"git clone --single-branch -b {br} https://github.com/MGRich/MaterializedBot.git git".split()).communicate()
     if __file__.endswith("pyw"):
-        subprocess.Popen("ren git\\bot.py bot.pyw", shell=True).communicate()
+        subprocess.Popen("mv git/bot.py bot.pyw", shell=True).communicate()
     await ctx.send("Moving and deleting files..")
     print("Moving..")
-    subprocess.Popen("xcopy /e /y git .", shell=True).communicate()
+    subprocess.Popen("mv git .", shell=True).communicate()
     print("Deleting..")
     try:
-        subprocess.Popen("del /s /q git\\*", shell=True).communicate()
-        subprocess.Popen("rmdir /s /q git\\cogs", shell=True).communicate()
-        subprocess.Popen("rmdir /s /q git\\.git", shell=True).communicate()
+        subprocess.Popen("del -f -r git", shell=True).communicate()
     except:
         pass
     await ctx.send("Restarting..")
     print("Commence restart.")
+    await bot.change_presence(activity=discord.Activity(name=f"Restarting..", type=0))
     os.execv(sys.executable, [console, __file__, str(ctx.channel.id)])
     #except:
-    #    os.system("del /s /q git\\*")
+    #    os.system("del /s /q git/*")
     #    await ctx.send(traceback.format_exc())
 
 @bot.command()
@@ -328,7 +344,14 @@ async def restart(ctx, console="python"):
     await ctx.send("Restarting..")
     #await bot.close()
     print("Commence restart.")
+    await bot.change_presence(activity=discord.Activity(name=f"Restarting..", type=0))
     os.execv(sys.executable, [console, __file__, str(ctx.channel.id)])
+
+@bot.command(aliases=['die', 'kys', 'kms', 'dannydeleto', 'deletthis', 'kill', 'death'])
+@ownerbt()
+async def shutdown(ctx):
+    await ctx.send("Shutting down..")
+    sys.exit(0)
 
 #@bot.command()
 #@ownerbt()
