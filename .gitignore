@@ -1,0 +1,9 @@
+*
+cogs/__pycache__
+cogs/helprs/__pycache__
+!/.gitignore
+!bot.py
+!cogs/
+!cogs/*
+!cogs/helprs
+!cogs/helprs/*

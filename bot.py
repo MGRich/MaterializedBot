@@ -321,7 +321,8 @@ async def updbot(ctx, force=None):
         subprocess.Popen("mv git/bot.py bot.pyw", shell=True).communicate()
     await ctx.send("Moving and deleting files..")
     print("Moving..")
-    subprocess.Popen("mv git .", shell=True).communicate()
+    subprocess.Popen("mv -f git/* .", shell=True).communicate()
+    subprocess.Popen("mv -f git/cogs ./cogs", shell=True).communicate()
     print("Deleting..")
     try:
         subprocess.Popen("rm -f -r git", shell=True).communicate()

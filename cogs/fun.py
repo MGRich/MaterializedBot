@@ -59,6 +59,10 @@ class Fun:
             e.colour = memb.roles[-1].colour
         await ctx.send(embed=e)
 
+    @commands.command()
+    async def clap(self, ctx, *, text):
+        await ctx.send('👏'.join(text.split(" ")))
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))

@@ -132,6 +132,12 @@ class Moderation:
         await msg.delete()
 
     #@commands.command()
+    #@commands.guild_only()
+    @commands.command()
+    async def error(self, ctx, good):
+        await ctx.send(good + 5)
+
+    #@commands.command()
     #@commands.bot_has_permissions(manage_messages=True)
     #async def cleanup(self, ctx, count=100):
     #    if count > 100:

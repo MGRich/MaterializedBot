@@ -6,7 +6,10 @@ from cogs.helprs.suggestions import suggestions
 
 #emb = 0xF2CEFE        
 
-class IMGGal:
+def Galerr(Exception):
+    pass
+
+class IMGGallery:
 
     def __init__(self, bot):
         self.bot = bot
@@ -23,9 +26,9 @@ class IMGGal:
         else:
             ed.remove(id)
         json.dump(jsn, open('igl.json', 'w'), sort_keys=True, indent=2)
-
-    @commands.command(name="imggal")
-    async def _imggal(self, ctx, *args):
+   
+    @commands.group(invoke_without_command=True)
+    async def imggal(self, ctx, *args):
         """Initiates IMGGal.
         [imggal]"""
         #for x in open('igl.txt').read().split('\n'):
@@ -48,7 +51,7 @@ class IMGGal:
         if len(args) == 1:
             args = args[0].split()
         for x in imggali:
-            if len(os.listdir(f"imggal\\{x}")) == 0:
+            if len(os.listdir(f"imggal/{x}")) == 0:
                 imggali.remove(x)
         try:
             imggaln = args[0]
@@ -63,7 +66,7 @@ class IMGGal:
         except:
             imggaln = random.choice(imggali)
         #print(imggaln)
-        img_list = os.listdir("imggal\\" + imggaln)
+        img_list = os.listdir("imggal/" + imggaln)
         imgl = len(img_list)
         imggaln = imggaln.replace("_", " ")
         try:
@@ -74,7 +77,7 @@ class IMGGal:
                 raise ValueError()
         except:
             if len(img_list) == 0:
-                await ctx.invoke(self._imggal)
+                await ctx.invoke(self.imggal)
             img = random.choice(img_list)
             img_dir = os.path.join("imggal", imggaln, img)
             img = re.sub(r"[^a-zA-Z0-9.]","",img)
@@ -84,7 +87,7 @@ class IMGGal:
         if not disp.endswith("s"):
             disp = disp + "s"
         disp = disp + "."
-        with open("imggal\\colors.json") as clrs:
+        with open("imggal/colors.json") as clrs:
             clls = json.load(clrs)
             try:
                 clr = discord.Color(clls[imggaln])
@@ -114,7 +117,7 @@ class IMGGal:
                 await msg.delete()
                 self.modjsn(ctx.message.author.id, False, True)
                 self.modjsn(ctx.channel.id, False, False)
-                return await ctx.invoke(self._imggal, "{0} -{1}".format(imggaln, img))
+                return await ctx.invoke(self.imggal, "{0} -{1}".format(imggaln, img))
 
             if (choice[0].emoji == '❌'):
                 await msg.clear_reactions()
@@ -127,7 +130,7 @@ class IMGGal:
                 await msg.delete()
                 self.modjsn(ctx.message.author.id, False, True)
                 self.modjsn(ctx.channel.id, False, False)
-                return await ctx.invoke(self._imggal, "-{0}".format(imggaln))
+                return await ctx.invoke(self.imggal, "-{0}".format(imggaln))
                 
         except asyncio.futures.TimeoutError:
             #await msg.delete()
@@ -141,8 +144,8 @@ class IMGGal:
             self.modjsn(ctx.message.author.id, False, True)
             self.modjsn(ctx.channel.id, False, False)
 
-    @commands.command()
-    async def list(self, ctx):
+    @imggal.command(name="list")
+    async def _list(self, ctx):
         """Lists all the IMGGal choices."""
         lst = os.listdir("imggal")
         lst.remove("colors.json")
@@ -153,7 +156,7 @@ class IMGGal:
                 lst[y] = x + " ({} images)".format(str(len(os.listdir(os.path.join("imggal", x)))))
         await ctx.send(f"List of current IMGGals:\n`{', '.join(lst)}`")
 
-    @commands.command()
+    @imggal.command()
     async def submit(self, ctx, imggal, *imgs):
         """Adds an image(s) to an IMGGal.
         <imggal> <image link(s) or upload>"""
@@ -179,7 +182,7 @@ class IMGGal:
             return await ctx.send("An error occured.")
         await ctx.send("Submission sent.")
 
-    @commands.command()
+    @imggal.command()
     async def request(self, ctx, imggal, *color):
         """Requests for an IMGGal to be made.
         Color is best made an integer color or hex color prefixed with "0x".
@@ -200,6 +203,5 @@ class IMGGal:
         await ctx.send("Request sent.")
 
 
-
 def setup(bot):
-    bot.add_cog(IMGGal(bot))
+    bot.add_cog(IMGGallery(bot))
