@@ -9,15 +9,25 @@ class Help:
     def __init__(self, bot):
         self.bot = bot
     
-    def prs(self, cat, cmd = None):
+    def prs(self, cat = None, cmd = None, scmd = None):
+        #return discord.Embed(title="hi", description = f"{self}, {cat}, {cmd}, {scmd}")
         if not cat:
             elist = []
             for x in help:
                 e = discord.Embed(title=help[x]['name'], colour=discord.Colour(json.load(open('info.json'))['color']))
                 fls = [help[x]['value'], ""]
                 for y in help[x]['commands']:
-                    fln = help[x]['commands'][y].split("\n")[0]
-                    fls.append(f"`{y}`: {fln}")
+                    if type(help[x]['commands'][y]) == dict:
+                        sls = [help[x]['commands'][y]['value'], ""]
+                        for z in help[x]['commands'][y]['commands']:
+                            sln = help[x]['commands'][y]['commands'][z].split("\n")[0]
+                            sls.append(f"`{y} {z}`: {sln}")
+                        sls = "\n".join(sls)
+                        #print(y)
+                        e.add_field(name=y, value=sls)
+                    else:
+                        fln = help[x]['commands'][y].split("\n")[0]
+                        fls.append(f"`{y}`: {fln}")
                 fls = "\n".join(fls)
                 e.description = fls
                 elist.append(e)
@@ -26,12 +36,38 @@ class Help:
         ctt = help[cat]
         e = discord.Embed(title=ctt['name'])
         lns = [f"{ctt['value']}", ""]
-        for x in ctt['commands']:
-            fln = ctt['commands'][x].split("\n")[0]
-            lns.append(f"`{x}`: {fln}")
-        e.description = "\n".join(lns)
         if cmd:
-            e.description = f"`{cmd}`\n\n" + ctt['commands'][cmd]
+            if type(ctt['commands'][cmd]) == dict:
+                #e.clear_fields()
+                e.title = f"{ctt['name']}: {cmd}"
+                stt = ctt['commands'][cmd]
+                if scmd:
+                    e.description = f"`{cmd} {scmd}`\n\n" + stt['commands'][scmd]
+                else:
+                    sls = [ctt['commands'][cmd]['value'], ""]
+                    for z in ctt['commands'][cmd]['commands']:
+                        #print(ctt['commands'][cmd]['commands'][z])
+                        sln = ctt['commands'][cmd]['commands'][z].split("\n")[0]
+                        sls.append(f"`{cmd} {z}`: {sln}")
+                    #print(y)
+                    e.description = "\n".join(sls)
+            else:
+                e.description = f"`{cmd}`\n\n" + ctt['commands'][cmd]
+        else:
+            for x in ctt['commands']:
+                if type(ctt['commands'][x]) == dict:
+                    sls = [ctt['commands'][x]['value'], ""]
+                    for z in ctt['commands'][x]['commands']:
+                        #print(ctt['commands'][cmd]['commands'][z])
+                        sln = ctt['commands'][x]['commands'][z].split("\n")[0]
+                        sls.append(f"`{x} {z}`: {sln}")
+                    sls = "\n".join(sls)
+                    #print(y)
+                    e.add_field(name=x, value=sls)
+                else:
+                    fln = ctt['commands'][x].split("\n")[0]
+                    lns.append(f"`{x}`: {fln}")
+            e.description = "\n".join(lns)
         e.colour = discord.Colour(json.load(open('info.json'))['color'])
         e.set_footer(text="Use \"help category\" for more info on a category. Follow it up with a command in the category to get info on a command.")
         return e
@@ -52,16 +88,18 @@ class Miscellaneous:
         args = list(args)
         for y, x in enumerate(args):
             args[y] = x.lower()
-        try:
-            if len(args) == 1:
-                emb = Help.prs(self, args[0])
-            elif len(args) == 2:
-                emb = Help.prs(self, args[0], args[1])
-            elif len(args) == 0:
-                return await pag(extras=Help.prs(self, None)).paginate(ctx)
-            await ctx.send(embed=emb)
-        except:
-            await ctx.send("That is not a valid category/command.")
+        #try:
+        if len(args) == 1:
+            emb = Help.prs(self, args[0])
+        elif len(args) == 2:
+            emb = Help.prs(self, args[0], args[1])
+        elif len(args) >= 3:
+            emb = Help.prs(self, args[0], args[1], args[2])
+        elif len(args) == 0:
+            return await pag(extras=Help.prs(self)).paginate(ctx)
+        await ctx.send(embed=emb)
+        #except KeyError:
+        #    await ctx.send("That is not a valid category/command.")
 
     @commands.command()
     async def suggest(self, ctx, *args):

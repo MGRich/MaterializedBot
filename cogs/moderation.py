@@ -127,15 +127,13 @@ class Moderation:
                 return msg.author == member
             return True
         await ctx.channel.purge(limit=count, check=check)
-        msg = await ctx.send(f"Purged {count-1} messages!")
-        await sleep(3)
-        await msg.delete()
+        await ctx.send(f"Purged {count-1} messages!", delete_after=3)
 
     #@commands.command()
     #@commands.guild_only()
-    @commands.command()
-    async def error(self, ctx, good):
-        await ctx.send(good + 5)
+    #@commands.command()
+    #async def error(self, ctx, good):
+    #    await ctx.send(good + 5)
 
     #@commands.command()
     #@commands.bot_has_permissions(manage_messages=True)

@@ -121,7 +121,7 @@ async def reload(ctx, *cogs):
             #print(cog)
         except:
             bot.unload_extension(cog)
-            q.append(msg.content.replace(f"\n! {cog}"))
+            q.append(f"\n! {cog} !")
             print("-----START {}".format(cog))
             traceback.print_exc()
             print("-----END   {}".format(cog))

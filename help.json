@@ -13,10 +13,14 @@
         "value": "An command system to simulate a public image gallery.",
         "name": "IMGGal",
         "commands": {
-            "imggal": "Initiates an IMGGal.\n\nSyntax: [imggal]",
-            "list": "Lists all the current IMGGals and how many images are in them.",
-            "request": "Requests for an IMGGal to be created.\nIf accepted, an empty IMGGal will be made with that name.\nYou can then use `submit` to add images.\n\nSyntax: <imggal to be made>",
-            "submit": "Submits image(s) for an IMGGal.\nIf accepted, the image(s) will be downloaded into the corresponding IMGGal.\nYou can submit 4 ATTACHMENTS at a time due to API limitations.\nI'm pretty sure more than 4 links work.\n\nSyntax: <existing imggal> <image link(s) or attachment(s)>"
+            "imggal": {
+                "value": "Initiates an IMGGal.\nSyntax: [imggal or subcommand]",
+                "commands": {
+                    "list": "Lists all the current IMGGals and how many images are in them.",
+                    "request": "Requests for an IMGGal to be created.\nIf accepted, an empty IMGGal will be made with that name.\nYou can then use `submit` to add images.\n\nSyntax: <imggal to be made>",
+                    "submit": "Submits image(s) for an IMGGal.\nIf accepted, the image(s) will be downloaded into the corresponding IMGGal.\nYou can submit 4 ATTACHMENTS at a time due to API limitations.\nI'm pretty sure more than 4 links work.\n\nSyntax: <existing imggal> <image link(s) or attachment(s)>"
+                }
+            }
         }
     },
     "moderation": {
@@ -42,13 +46,14 @@
         "value": "A tag system where people can create, share, and use various tags. Also a pain in the ass to implement.",
         "name": "Tags",
         "commands": {
-            "add": "Adds/updates a LOCAL tag.\nDouble quotes sadly do not work.\nYou must own the tag to update it.\n\nSyntax: <tag> <tag string>\nAlias: `update`",
-            "addp": "Adds/updates a PUBLIC tag.\nDouble quotes sadly do not work.\nYou must own the tag to update it.\n\nSyntax: <tag> <tag string>\nAlias: `update`",
-            "delete": "Deletes a LOCAL tag.\nYou must own the tag.\n\nSyntax: <tag>",
-            "deletep": "Deletes a PUBLIC tag.\nYou must own the tag.\n\nSyntax: <tag>",
-            "owner": "Displays who owns a tag.\nWorks with both local and public tags.\n\nSyntax: <tag>",
-            "tag": "Displays a tag.\nLocal tags override public tags.\n\nSyntax: <tag>",
-            "tagp": "Displays a tag with local tags overriding public tags.\n\nSyntax: <tag>"
+            "tag": {
+                "value": "The host command for the tag system.\nIn tag use, local tags override public tags.\nSyntax: [tag or subcommand]",
+                "commands": {
+                    "add/addp": "Adds/updates a LOCAL/PUBLIC tag.\nYou must own the tag to update it.\n\nSyntax: <tag> <tag string>\nAlias: `update/update`",
+                    "delete/deletep": "Deletes a LOCAL/PUBLIC tag.\nYou must own the tag.\n\nSyntax: <tag>",
+                    "owner": "Displays who owns a tag.\nWorks with both local and public tags.\n\nSyntax: <tag>",
+                }
+            }
         }
     },
     "miscellaneous": {
